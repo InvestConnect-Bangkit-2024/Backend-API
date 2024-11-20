@@ -17,7 +17,6 @@ jobs:
           echo DB_NAME=${{ secrets.DB_NAME }}
           echo DB_PASSWORD=${{ secrets.DB_PASS }}
           echo DB_USER=${{ secrets.DB_USER }}
-          echo ML_URL=${{ secrets.ML_URL }}
 
       - name: Test Service Account
         run: |
