@@ -2,22 +2,57 @@ name: CI/CD to Google Cloud Run
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main"] # Trigger on push to the main branch
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
-    steps:
-      # Debug the SERVICE_ACCOUNT_KEY
-      - name: Debug ENV Vars
-        run: |
-          echo "Checking if SERVICE_ACCOUNT_KEY is set"
-          echo PORT=${{ secrets.PORT }}
-          echo DB_HOST=${{ secrets.DB_HOST }}
-          echo DB_NAME=${{ secrets.DB_NAME }}
-          echo DB_PASSWORD=${{ secrets.DB_PASS }}
-          echo DB_USER=${{ secrets.DB_USER }}
 
-      - name: Test Service Account
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Step 2: Create the .env File
+      - name: Create .env file
+        run: echo "${{ secrets.ENV }}" > .env
+
+      # Step 3: Set Up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # Step 4: Login to Google Artifact Registry
+      - name: Login to Google Artifact Registry
+        uses: docker/login-action@v1
+        with:
+          registry: asia-southeast2-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+
+      # Step 5: Build Docker image
+      - name: Build Docker image
+        run: docker build -t backend-api:latest .
+
+      # Step 6: Tag Docker image
+      - name: Tag Docker image
+        run: docker tag backend-api:latest asia-southeast2-docker.pkg.dev/investconnect-442106/investconnect-repo/backend-api:latest
+
+      # Step 7: Push Docker image to Artifact Registry
+      - name: Push Docker image
+        run: docker push asia-southeast2-docker.pkg.dev/investconnect-442106/investconnect-repo/backend-api:latest
+
+      # Step 8: Set up Google Cloud SDK
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          project_id: investconnect-442106
+          service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+
+      # Step 9: Deploy to Cloud Run
+      - name: Deploy to Cloud Run
         run: |
-          echo "SERVICE ACCOUNT is set: ${{ secrets.SERVICE_ACCOUNT_KEY }}"
+          gcloud run deploy backend-api \
+            --image asia-southeast2-docker.pkg.dev/investconnect-442106/investconnect-repo/backend-api:latest \
+            --region asia-southeast2 \
+            --platform managed \
+            --allow-unauthenticated
