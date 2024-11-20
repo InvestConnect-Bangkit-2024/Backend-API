@@ -1,11 +1,12 @@
 const axios = require("axios");
 const { getAllInvestors } = require("../services/InvestorsServices");
+require("dotenv").config();
 
 const getInvestors = async (req, res, next) => {
   try {
     const investors = await getAllInvestors();
 
-    const predictResponse = await axios.post("http://localhost:7000/predict", {
+    const predictResponse = await axios.post(`${process.env.ML_URL}/predict`, {
       investors,
     });
 
