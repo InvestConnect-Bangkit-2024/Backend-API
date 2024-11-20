@@ -9,12 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Debug the SERVICE_ACCOUNT_KEY
-      - name: Debug SERVICE_ACCOUNT_KEY
+      - name: Debug ENV Vars
         run: |
           echo "Checking if SERVICE_ACCOUNT_KEY is set"
-          echo "${{ secrets.SERVICE_ACCOUNT_KEY }}"
+          echo PORT=${{ secrets.PORT }}
+          echo DB_HOST=${{ secrets.DB_HOST }}
+          echo DB_NAME=${{ secrets.DB_NAME }}
+          echo DB_PASSWORD=${{ secrets.DB_PASS }}
+          echo DB_USER=${{ secrets.DB_USER }}
+          echo ML_URL=${{ secrets.ML_URL }}
 
-      # Test ENV_PROD Secret
-      - name: Test ENV_PROD Secret
+      - name: Test Service Account
         run: |
-          echo "Environment variable is set: ${{ secrets.ENV_PROD }}"
+          echo "SERVICE ACCOUNT is set: ${{ secrets.SERVICE_ACCOUNT_KEY }}"
