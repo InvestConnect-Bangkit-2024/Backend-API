@@ -1,6 +1,5 @@
-// models/InvestorsModel.js
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const { sequelize } = require("../config/database"); // Correctly import sequelize
 
 const Investors = sequelize.define("Investors", {
   Code: {
