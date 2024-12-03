@@ -1,13 +1,11 @@
 const express = require("express");
-const authenticateToken = require("../middleware/authenticateToken"); // Adjust path to your middleware
+const authenticateToken = require("../middleware/AuthenticateToken");
 const router = express.Router();
-const User = require("../models/UsersModel"); // Adjust path to your User model
+const User = require("../models/UsersModel");
 
-// Route to get user profile details by user ID (with authentication)
 router.get("/account/:id", authenticateToken, async (req, res) => {
   const userId = req.params.id;
 
-  // Check if the authenticated user is trying to access their own profile
   if (req.userId !== userId) {
     return res
       .status(403)
