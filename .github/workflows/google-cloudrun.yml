@@ -21,6 +21,18 @@ jobs:
       # Step 3: Test the .env file
       - name: Test environment variables
         run: |
-          echo "Testing environment variables..."
+          echo "Testing .env file contents..."
           cat .env  # Print out the .env file content to verify that the secrets are properly populated
+        shell: bash
+
+      # Step 4: Create the SERVICE_ACCOUNT_KEY.json file
+      - name: Create SERVICE_ACCOUNT_KEY.json file
+        run: echo "${{ secrets.SERVICE_ACCOUNT_KEY }}" > SERVICE_ACCOUNT_KEY.json
+        shell: bash
+
+      # Step 5: Test the SERVICE_ACCOUNT_KEY.json file
+      - name: Test SERVICE_ACCOUNT_KEY.json
+        run: |
+          echo "Testing SERVICE_ACCOUNT_KEY.json file contents..."
+          cat SERVICE_ACCOUNT_KEY.json  # Print out the SERVICE_ACCOUNT_KEY.json file content
         shell: bash
