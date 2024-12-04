@@ -1,32 +1,50 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("../config/database"); // Adjust the path to your actual sequelize instance
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-// Define the User model for the 'users' table
-const User = sequelize.define(
-  "User",
+const Users = sequelize.define(
+  'user',
   {
-    id: {
-      type: DataTypes.STRING(50),
-      primaryKey: true,
+    user_id: {
+      type: DataTypes.STRING,
       allowNull: false,
+      primaryKey: true,
     },
     username: {
-      type: DataTypes.TEXT,
-      allowNull: true, // Set to false if you want to enforce non-null values
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
     },
     password: {
-      type: DataTypes.TEXT,
-      allowNull: true, // Set to false if you want to enforce non-null values
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     fullname: {
-      type: DataTypes.TEXT,
-      allowNull: true, // Set to false if you want to enforce non-null values
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    phone_number: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    type: {
+      type: DataTypes.ENUM('UMKM', 'Investor'),
+      allowNull: false,
+      validate: {
+        isIn: {
+          args: [['UMKM', 'Investor']],
+          msg: 'Type must be UMKM or Investor',
+        },
+      },
     },
   },
   {
-    tableName: "users",
+    tableName: 'users',
     timestamps: false,
   }
 );
 
-module.exports = User;
+module.exports = Users;

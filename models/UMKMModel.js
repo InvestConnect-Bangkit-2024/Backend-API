@@ -1,10 +1,10 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
-const Investors = sequelize.define(
-  'investor',
+const UMKM = sequelize.define(
+  'umkm',
   {
-    investor_id: {
+    umkm_id: {
       type: DataTypes.STRING(50),
       allowNull: false,
       unique: true,
@@ -14,44 +14,51 @@ const Investors = sequelize.define(
         key: 'user_id',
       },
     },
+    company_name: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    founding_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     location: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    investment_focus: {
+    sector: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    stages: {
+    stage: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    thesis: {
+    description: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    total_deals: {
-      type: DataTypes.INTEGER,
+    founder_name: {
+      type: DataTypes.STRING(255),
       allowNull: false,
     },
-    total_investments: {
+    amount_seeking: {
       type: DataTypes.BIGINT,
       allowNull: false,
     },
-    deal_type: {
+    preferred_investment_type: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    geographic_focus: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    criteria: {
+    intended_use_of_funds: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
   },
-  { tableName: 'investors', timestamps: false }
+  {
+    tableName: 'umkm',
+    timestamps: false,
+  }
 );
 
-module.exports = Investors;
+module.exports = UMKM;
