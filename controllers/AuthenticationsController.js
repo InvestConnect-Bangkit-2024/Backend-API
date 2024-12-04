@@ -140,7 +140,6 @@ router.post('/register', async (req, res, next) => {
     const refresh_token = generate_refresh_token(newUser.user_id);
 
     res.status(201).json({
-      status: 'success',
       message: 'user registered successfully',
       data: { user_id, access_token, refresh_token },
     });
@@ -169,7 +168,6 @@ router.post('/login', async (req, res, next) => {
     const refresh_token = generate_refresh_token(user_data.id);
 
     res.json({
-      status: 'success',
       message: 'Authentication successful',
       data: { user_id: user_data.user_id, access_token, refresh_token },
     });
@@ -193,7 +191,6 @@ router.post('/refresh-token', (req, res, next) => {
 
     const access_token = generate_access_token(decoded.userId);
     res.json({
-      status: 'success',
       message: 'Access token refreshed',
       data: { access_token },
     });
@@ -203,7 +200,6 @@ router.post('/refresh-token', (req, res, next) => {
 // Example of a protected route (GET /auth/protected)
 router.get('/protected', authenticate_token, (req, res) => {
   res.json({
-    status: 'success',
     message: 'You have access to this protected route!',
   });
 });

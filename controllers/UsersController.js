@@ -25,11 +25,10 @@ router.get('/account/:id', authenticateToken, async (req, res, next) => {
       });
     }
     res.status(200).json({
-      status: 'success',
       message: 'user profile fetched successfully',
       data: {
-        user_data: user_data.toJSON(),
-        additional_data: additional_data.toJSON(),
+        ...user_data.toJSON(),
+        ...additional_data.toJSON(),
       },
     });
   } catch (error) {
