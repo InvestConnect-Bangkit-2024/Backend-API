@@ -3,3 +3,4 @@ node_modules/
 tests/
 .prettierrc
 eslint.config.mjs
+owner-sa-key.json

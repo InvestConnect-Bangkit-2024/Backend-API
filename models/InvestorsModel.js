@@ -14,6 +14,9 @@ const Investors = sequelize.define(
         key: 'user_id',
       },
     },
+    img_url: {
+      type: DataTypes.STRING(255),
+    },
     location: {
       type: DataTypes.STRING(255),
       allowNull: false,

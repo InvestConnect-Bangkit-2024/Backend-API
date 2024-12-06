@@ -1,11 +1,11 @@
 const express = require('express');
-const authenticateToken = require('../middleware/AuthenticateToken');
+const authenticate_token = require('../middleware/AuthenticateToken');
 const router = express.Router();
 const user = require('../models/UsersModel');
 const umkm = require('../models/UMKMModel');
 const investor = require('../models/InvestorsModel');
 const NotFoundError = require('../exceptions/NotFoundError');
-router.get('/account/:id', authenticateToken, async (req, res, next) => {
+router.get('/account/:id', authenticate_token, async (req, res, next) => {
   try {
     const user_id = req.params.id;
     const user_data = await user.findOne({
@@ -36,7 +36,7 @@ router.get('/account/:id', authenticateToken, async (req, res, next) => {
   }
 });
 
-router.put('/account/:id', authenticateToken, async (req, res, next) => {
+router.put('/account/:id', authenticate_token, async (req, res, next) => {
   try {
     const updates = req.body;
     const user_id = req.params.id;

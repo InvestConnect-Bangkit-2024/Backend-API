@@ -18,6 +18,7 @@ const UMKM = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    img_url: { type: DataTypes.STRING(255) },
     founding_date: {
       type: DataTypes.DATE,
       allowNull: true,
