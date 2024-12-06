@@ -53,6 +53,7 @@ router.put('/account/:id', authenticate_token, async (req, res, next) => {
       updates.password = await bcrypt.hash(updates.new_password, 10);
       delete updates.new_password;
     }
+
     for (const [key, value] of Object.entries(updates)) {
       current_data[key] = value;
     }

@@ -11,7 +11,7 @@ const { nanoid } = require('nanoid');
 router.get('/umkm', async (req, res, next) => {
   try {
     const umkm_list = await umkm.findAll({
-      attributes: ['umkm_id', 'company_name', 'sector'],
+      attributes: ['umkm_id', 'company_name', 'img_url', 'sector'],
     });
     res
       .status(200)

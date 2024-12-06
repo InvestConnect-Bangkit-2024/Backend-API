@@ -7,7 +7,12 @@ const investor = require('../models/InvestorsModel');
 router.get('/investors', async (req, res, next) => {
   try {
     const investor_list = await investor.findAll({
-      attributes: ['investor_id', 'investor_name', 'investment_focus'],
+      attributes: [
+        'investor_id',
+        'investor_name',
+        'img_url',
+        'investment_focus',
+      ],
     });
     res
       .status(200)
