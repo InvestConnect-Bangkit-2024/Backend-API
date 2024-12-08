@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Investors = sequelize.define(
-  'investor',
+  'investors',
   {
     investor_id: {
       type: DataTypes.STRING(50),

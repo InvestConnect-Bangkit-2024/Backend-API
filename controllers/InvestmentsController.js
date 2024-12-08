@@ -2,9 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const { nanoid } = require('nanoid');
-const investment = require('../models/InvestmentsModel');
 const investment_validator = require('../validator/InvestmentValidator');
 const authenticate_token = require('../middleware/AuthenticateToken');
+const { investments } = require('../models');
 
 router.post('/investments', authenticate_token, async (req, res, next) => {
   try {

@@ -61,5 +61,4 @@ const UMKM = sequelize.define(
     timestamps: false,
   }
 );
-
 module.exports = UMKM;

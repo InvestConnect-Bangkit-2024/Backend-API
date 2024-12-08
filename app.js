@@ -13,10 +13,9 @@ const errorHandler = require('./middleware/ErrorHandler');
 
 const app = express();
 
-app.use(body_parser.json());
-
 connectDB();
 
+app.use(body_parser.json());
 app.use(investor_routes);
 app.use(auth_routes);
 app.use(users_routes);

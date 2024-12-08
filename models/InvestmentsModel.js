@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
-const Investments = sequelize.define(
-  'Investments',
+const investments = sequelize.define(
+  'investments',
   {
     investment_id: {
       type: DataTypes.INTEGER,
@@ -11,11 +11,11 @@ const Investments = sequelize.define(
       allowNull: false,
     },
     umkm_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(50),
       allowNull: false,
     },
     investor_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(50),
       allowNull: false,
     },
     investment_amount: {
@@ -34,8 +34,16 @@ const Investments = sequelize.define(
       type: DataTypes.DATE,
     },
     request_type: {
-      type: DataTypes.ENUM('UMKM Request', 'Invetor Offer'),
+      type: DataTypes.ENUM('UMKM Request', 'Investor Offer'),
       allowNull: false,
+    },
+    investor_status: {
+      type: DataTypes.ENUM('Review', 'Rejected', 'Approved'),
+      defaultValue: 'Review',
+    },
+    umkm_status: {
+      type: DataTypes.ENUM('Review', 'Rejected', 'Approved'),
+      defaultValue: 'Review',
     },
   },
   {
@@ -44,4 +52,4 @@ const Investments = sequelize.define(
   }
 );
 
-module.exports = Investments;
+module.exports = investments;

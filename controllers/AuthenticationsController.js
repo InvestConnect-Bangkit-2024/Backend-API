@@ -188,9 +188,8 @@ router.post(
 
 // Login route (POST /auth/login)
 router.post('/login', async (req, res, next) => {
-  const { username, password } = req.body;
-
   try {
+    const { username, password } = req.body;
     const user_data = await user.findOne({ where: { username } });
 
     if (!user_data) {
@@ -202,8 +201,8 @@ router.post('/login', async (req, res, next) => {
       throw new AuthenticationError('Invalid credentials');
     }
 
-    const access_token = generate_access_token(user_data.id);
-    const refresh_token = generate_refresh_token(user_data.id);
+    const access_token = generate_access_token(user_data.user_id);
+    const refresh_token = generate_refresh_token(user_data.user_id);
 
     res.json({
       message: 'Authentication successful',
