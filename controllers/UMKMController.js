@@ -54,12 +54,42 @@ router.get('/umkm/:id/investments', async (req, res, next) => {
   }
 });
 
+router.post('/umkm/:id/investments', async (req, res, next) => {
+  try {
+    const umkm_id = req.params.id;
+    const { investor_id, investment_amount } = req.body;
+    await investment_validator.validate_investment_payload({
+      umkm_id,
+      investor_id,
+      investment_amount,
+    });
+
+    await investments.create({
+      investment_id: `investment-${nanoid(16)}`,
+      umkm_id,
+      investor_id,
+      investment_amount,
+      created_at: new Date(),
+      status: 'Pending',
+      confirmed_date: null,
+      request_type: 'UMKM Request',
+      investor_status: 'Review',
+      umkm_status: 'Review',
+    });
+
+    return res
+      .status(200)
+      .json({ message: 'Successfully create investment request' });
+  } catch (error) {
+    next(error);
+  }
+});
 router.put('/umkm/:id/investments/:investment_id', async (req, res, next) => {
   try {
     const umkm_id = req.params.id;
-    const invesment_id = req.params.investment_id;
+    const investment_id = req.params.investment_id;
 
-    const { umkm_status } = rqe.body;
+    const { umkm_status } = req.body;
 
     if (umkm_status !== 'Rejected' && umkm_status !== 'Approved') {
       throw new InvariantError(

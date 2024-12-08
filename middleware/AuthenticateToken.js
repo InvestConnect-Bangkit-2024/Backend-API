@@ -26,7 +26,6 @@ async function authenticate_token(req, res, next) {
 
     // Step 2: Check if the userId from the token matches the requested account id
     const requestedUserId = req.params.id;
-
     if (decodedAccessToken.user_id !== requestedUserId) {
       return res.status(403).json({
         message: 'Access forbidden: token does not match requested user',

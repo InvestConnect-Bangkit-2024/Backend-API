@@ -5,6 +5,8 @@ const router = express.Router();
 const { investors, investments } = require('../models/index');
 const InvariantError = require('../exceptions/InvariantError');
 const authenticate_token = require('../middleware/AuthenticateToken');
+const investment_validator = require('../validator/InvestmentValidator');
+const { nanoid } = require('nanoid');
 // Routes
 router.get('/investors', async (req, res, next) => {
   try {
@@ -49,7 +51,7 @@ router.get('/investors/recommendation', async (req, res, next) => {
 router.get('/investors/:id', async (req, res, next) => {
   try {
     const investor_id = req.params.id;
-    const investor_detail = await investor.findOne({
+    const investor_detail = await investors.findOne({
       where: { investor_id },
     });
     res.status(200).json({
@@ -73,6 +75,38 @@ router.get('/investors/:id/investments', async (req, res, next) => {
       message: 'Successfully get investments list associated with investor',
       data: result,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/investors/:id/investments', async (req, res, next) => {
+  try {
+    const investor_id = req.params.id;
+    const { umkm_id, investment_amount } = req.body;
+
+    await investment_validator.validate_investment_payload({
+      umkm_id,
+      investor_id,
+      investment_amount,
+    });
+
+    await investments.create({
+      investment_id: `investment-${nanoid(16)}`,
+      umkm_id,
+      investor_id,
+      investment_amount,
+      created_at: new Date(),
+      status: 'Pending',
+      confirmed_date: null,
+      request_type: 'Investor Offer',
+      investor_status: 'Review',
+      umkm_status: 'Review',
+    });
+
+    return res
+      .status(200)
+      .json({ message: 'Successfully create investment offer' });
   } catch (error) {
     next(error);
   }

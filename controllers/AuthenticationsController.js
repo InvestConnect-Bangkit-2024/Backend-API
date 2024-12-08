@@ -14,11 +14,14 @@ const authenticate_token = require('../middleware/AuthenticateToken');
 const user_validator = require('../validator/UserValidator');
 const investor_validator = require('../validator/InvestorValidator');
 const umkm_validator = require('../validator/UMKMValidator');
+const authentication_validator = require('../validator/AuthenticationValidator');
+
 const storage = require('../config/storage');
 const bucketName = 'investconnect-bucket';
 const upload_image = require('../middleware/UploadImage');
 const AuthenticationError = require('../exceptions/AuthenticationError');
-
+const NotFoundError = require('../exceptions/NotFoundError');
+const InvariantError = require('../exceptions/InvariantError');
 router.post(
   '/register',
   upload_image.single('img_file'),
@@ -190,10 +193,14 @@ router.post(
 router.post('/login', async (req, res, next) => {
   try {
     const { username, password } = req.body;
+    await authentication_validator.validate_login_payload({
+      username,
+      password,
+    });
     const user_data = await user.findOne({ where: { username } });
 
     if (!user_data) {
-      throw new AuthenticationError('Invalid credentials');
+      throw new NotFoundError('Invalid credentials');
     }
 
     const isMatch = await bcrypt.compare(password, user_data.password);
