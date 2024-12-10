@@ -6,6 +6,7 @@ const { models, umkm, investments } = require('../models/index');
 const investment_validator = require('../validator/InvestmentValidator');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../exceptions/InvariantError');
+const AuthorizationError = require('../exceptions/AuthorizationError');
 const { response } = require('../app');
 const NotFoundError = require('../exceptions/NotFoundError');
 
@@ -63,9 +64,9 @@ router.post('/umkm/:id/investments', async (req, res, next) => {
       investor_id,
       investment_amount,
     });
-
+    const investment_id = `investment-${nanoid(16)}`;
     await investments.create({
-      investment_id: `investment-${nanoid(16)}`,
+      investment_id,
       umkm_id,
       investor_id,
       investment_amount,
@@ -77,9 +78,10 @@ router.post('/umkm/:id/investments', async (req, res, next) => {
       umkm_status: 'Review',
     });
 
-    return res
-      .status(200)
-      .json({ message: 'Successfully create investment request' });
+    return res.status(200).json({
+      message: 'Successfully create investment request',
+      data: { investment_id },
+    });
   } catch (error) {
     next(error);
   }
@@ -98,17 +100,19 @@ router.put('/umkm/:id/investments/:investment_id', async (req, res, next) => {
     }
 
     const investment = await investments.findOne({
-      where: { investment_id, umkm_id },
+      where: { investment_id },
     });
 
     if (!investment) {
       throw new NotFoundError('Investment not found');
     }
 
-    await investments.update(
-      { umkm_status },
-      { where: { investment_id, umkm_id } }
-    );
+    if (investment.umkm_id !== umkm_id)
+      throw new AuthorizationError(
+        'You are not authorized to modify this investment.'
+      );
+
+    await investments.update({ umkm_status }, { where: { investment_id } });
 
     if (
       investment.investor_status === 'Approved' &&

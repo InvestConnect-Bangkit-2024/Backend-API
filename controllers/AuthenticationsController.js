@@ -15,6 +15,7 @@ const user_validator = require('../validator/UserValidator');
 const investor_validator = require('../validator/InvestorValidator');
 const umkm_validator = require('../validator/UMKMValidator');
 const authentication_validator = require('../validator/AuthenticationValidator');
+const { Sequelize } = require('sequelize');
 
 const storage = require('../config/storage');
 const bucketName = 'investconnect-bucket';
@@ -27,8 +28,15 @@ router.post(
   upload_image.single('img_file'),
   async (req, res, next) => {
     try {
-      const { username, email, password, fullname, phone_number, type } =
-        req.body;
+      const {
+        username,
+        email,
+        password,
+        fullname,
+        phone_number,
+        investor_name,
+        company_name,
+      } = req.body;
 
       await user_validator.validate_user_payload({
         username,
@@ -36,23 +44,31 @@ router.post(
         password,
         fullname,
         phone_number,
-        type,
       });
 
       const existingUser = await user.findOne({
-        where: { email },
+        where: {
+          [Sequelize.Op.or]: [{ email: email }, { username: username }],
+        },
       });
 
       if (existingUser) {
-        return res
-          .status(400)
-          .json({ status: 'fail', message: 'Email already taken' });
+        if (existingUser.email === email) {
+          throw new InvariantError('Email already taken');
+        } else if (existingUser.username === username) {
+          throw new InvariantError('Username already taken');
+        }
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      let user_id;
-      if (type == 'UMKM') user_id = `umkm-${nanoid(16)}`;
-      else if (type == 'Investor') user_id = `investor-${nanoid(16)}`;
+      let user_id, type;
+      if (company_name) {
+        user_id = `umkm-${nanoid(16)}`;
+        type = 'Investor';
+      } else if (investor_name) {
+        user_id = `investor-${nanoid(16)}`;
+        type = 'UMKM';
+      }
 
       let newUser = await user.build({
         user_id,
@@ -83,9 +99,8 @@ router.post(
       blobStream.on('finish', async () => {
         const img_url = `https://storage.googleapis.com/${bucketName}/${blob.name}`;
 
-        if (type === 'UMKM') {
+        if (company_name) {
           const {
-            company_name,
             founding_date,
             location,
             sector,
@@ -127,9 +142,8 @@ router.post(
 
           await newUser.save();
           await newUMKM.save();
-        } else if (type === 'Investor') {
+        } else if (investor_name) {
           const {
-            investor_name,
             location,
             investment_focus,
             stages,
@@ -200,12 +214,12 @@ router.post('/login', async (req, res, next) => {
     const user_data = await user.findOne({ where: { username } });
 
     if (!user_data) {
-      throw new NotFoundError('Invalid credentials');
+      throw new NotFoundError(`User ${username} does not exist`);
     }
 
     const isMatch = await bcrypt.compare(password, user_data.password);
     if (!isMatch) {
-      throw new AuthenticationError('Invalid credentials');
+      throw new AuthenticationError('Your password is incorrect');
     }
 
     const access_token = generate_access_token(user_data.user_id);

@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const { investors, investments } = require('../models/index');
 const InvariantError = require('../exceptions/InvariantError');
+const AuthorizationError = require('../exceptions/AuthorizationError');
 const authenticate_token = require('../middleware/AuthenticateToken');
 const investment_validator = require('../validator/InvestmentValidator');
 const { nanoid } = require('nanoid');
@@ -91,8 +92,9 @@ router.post('/investors/:id/investments', async (req, res, next) => {
       investment_amount,
     });
 
+    const investment_id = `investment-${nanoid(16)}`;
     await investments.create({
-      investment_id: `investment-${nanoid(16)}`,
+      investment_id,
       umkm_id,
       investor_id,
       investment_amount,
@@ -104,9 +106,10 @@ router.post('/investors/:id/investments', async (req, res, next) => {
       umkm_status: 'Review',
     });
 
-    return res
-      .status(200)
-      .json({ message: 'Successfully create investment offer' });
+    return res.status(200).json({
+      message: 'Successfully create investment offer',
+      data: { investment_id },
+    });
   } catch (error) {
     next(error);
   }
@@ -128,16 +131,21 @@ router.put(
       }
 
       const investment = await investments.findOne({
-        where: { investment_id, investor_id },
+        where: { investment_id },
       });
 
       if (!investment) {
         return res.status(404).json({ message: 'Investment not found' });
       }
 
+      if (investment.investor_id !== investor_id)
+        throw new AuthorizationError(
+          'You are not authorized to modify this investment.'
+        );
+
       await investments.update(
         { investor_status },
-        { where: { investment_id, investor_id } }
+        { where: { investment_id } }
       );
 
       if (

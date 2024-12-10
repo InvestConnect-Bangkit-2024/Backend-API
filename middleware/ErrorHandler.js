@@ -4,7 +4,9 @@ const errorHandler = (err, req, res, next) => {
   console.error(err);
   console.log(err instanceof ClientError);
   if (err instanceof ClientError) {
-    return res.status(err.statusCode).json({ message: err.message });
+    return res
+      .status(err.statusCode)
+      .json({ message: err.message, error: err.statusCode });
   }
 
   res.status(500).json({ message: 'An unexpected error occurred' });

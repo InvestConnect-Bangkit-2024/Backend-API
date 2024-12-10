@@ -24,11 +24,6 @@ const user_payload_schema = Joi.object({
     'string.base': 'Phone number must be a string',
     'any.required': 'Phone number is required',
   }),
-  type: Joi.string().valid('UMKM', 'Investor').required().messages({
-    'string.base': 'Type must be a string',
-    'any.required': 'Type is required',
-    'any.only': 'Type must be either UMKM or Investor',
-  }),
 });
 
 const user_validator = {
