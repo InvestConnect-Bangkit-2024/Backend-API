@@ -6,10 +6,7 @@ const router = express.Router();
 const user = require('../models/UsersModel');
 const investor = require('../models/InvestorsModel');
 const umkm = require('../models/UMKMModel');
-const {
-  generate_access_token,
-  generate_refresh_token,
-} = require('../token/TokenManager');
+const { generate_access_token } = require('../token/TokenManager');
 const authenticate_token = require('../middleware/AuthenticateToken');
 const user_validator = require('../validator/UserValidator');
 const investor_validator = require('../validator/InvestorValidator');
@@ -187,12 +184,11 @@ router.post(
           await newInvestor.save();
         }
 
-        const access_token = generate_access_token(newUser.user_id);
-        const refresh_token = generate_refresh_token(newUser.user_id);
+        const token = generate_access_token(newUser.user_id);
 
         res.status(201).json({
           message: 'user registered successfully',
-          data: { user_id, access_token, refresh_token },
+          data: { user_id, token },
         });
       });
 
@@ -222,37 +218,15 @@ router.post('/login', async (req, res, next) => {
       throw new AuthenticationError('Your password is incorrect');
     }
 
-    const access_token = generate_access_token(user_data.user_id);
-    const refresh_token = generate_refresh_token(user_data.user_id);
+    const token = generate_access_token(user_data.user_id);
 
     res.json({
       message: 'Authentication successful',
-      data: { user_id: user_data.user_id, access_token, refresh_token },
+      data: { user_id: user_data.user_id, token },
     });
   } catch (error) {
     next(error);
   }
-});
-
-// Refresh token route (POST /auth/refresh-token)
-router.post('/refresh-token', (req, res, next) => {
-  const { refresh_token } = req.body;
-
-  if (!refresh_token) {
-    return next(new InvariantError('Refresh token required'));
-  }
-
-  jwt.verify(refresh_token, process.env.REFRESH_TOKEN_KEY, (err, decoded) => {
-    if (err) {
-      return next(new InvariantError('Invalid refresh token'));
-    }
-
-    const access_token = generate_access_token(decoded.userId);
-    res.json({
-      message: 'Access token refreshed',
-      data: { access_token },
-    });
-  });
 });
 
 // Example of a protected route (GET /auth/protected)

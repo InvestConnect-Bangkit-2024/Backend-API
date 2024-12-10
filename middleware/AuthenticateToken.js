@@ -5,8 +5,6 @@ async function authenticate_token(req, res, next) {
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader?.split(' ')[1];
-    const refresh_token =
-      req.body.refresh_token || req.headers['x-refresh-token'];
 
     if (!token) {
       return res.status(403).json({ message: 'Access token required' });
