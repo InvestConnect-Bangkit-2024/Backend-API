@@ -9,7 +9,8 @@ const authenticate_token = require('../middleware/AuthenticateToken');
 const umkm_validator = require('../validator/UMKMValidator');
 const storage = require('../config/storage');
 const bucket_name = 'investconnect-bucket';
-const upload_image = require('../middleware/UploadImage');
+const upload = require('../middleware/UploadImage');
+
 // Routes
 router.get('/umkm', authenticate_token, async (req, res, next) => {
   try {
@@ -28,7 +29,7 @@ router.get('/umkm', authenticate_token, async (req, res, next) => {
 router.post(
   '/umkm',
   authenticate_token,
-  upload_image.single('img_file'),
+  upload.single('img_file'),
   async (req, res, next) => {
     try {
       const {
@@ -77,30 +78,27 @@ router.post(
         phone_number,
       });
 
-      console.log('here 1');
       const user_id = req.user_id;
       const umkm_id = `umkm-${nanoid(16)}`;
-      const img_file = req.file;
-      console.log('here 2');
 
-      if (!img_file) {
+      if (!req.file) {
         throw new InvariantError('Image file is required');
       }
-      console.log('here 3');
 
-      const blob = storage
-        .bucket(bucket_name)
-        .file(`images/${umkm_id}-image.jpg`);
-      const blobStream = blob.createWriteStream();
+      const bucket = storage.bucket(bucket_name);
+      const blob = bucket.file(`images/${umkm_id}-image.jpg`);
+      const blobStream = blob.createWriteStream({
+        resumable: false,
+        contentType: req.file.mimetype,
+      });
 
       blobStream.on('error', (err) => {
         next(err);
       });
 
       blobStream.on('finish', async () => {
-        console.log('here 5');
         const img_url = `https://storage.googleapis.com/${bucket_name}/${blob.name}`;
-        await UMKM.create({
+        const new_umkm = await UMKM.build({
           umkm_id,
           user_id,
           company_name,
@@ -125,13 +123,12 @@ router.post(
           growth_rate,
           phone_number,
         });
-        console.log('here 6');
+        await new_umkm.save();
       });
-
-      console.log('here 7');
       res
         .status(200)
         .json({ message: 'Successfully created new UMKM', data: umkm_id });
+      blobStream.end(req.file.buffer);
     } catch (error) {
       next(error);
     }

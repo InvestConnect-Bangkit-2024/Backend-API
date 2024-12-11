@@ -9,7 +9,8 @@ const { nanoid } = require('nanoid');
 
 const storage = require('../config/storage');
 const bucket_name = 'investconnect-bucket';
-const upload_image = require('../middleware/UploadImage');
+const upload = require('../middleware/UploadImage');
+
 const investor_validator = require('../validator/InvestorValidator');
 // Routes
 router.get('/investors', authenticate_token, async (req, res, next) => {
@@ -34,7 +35,7 @@ router.get('/investors', authenticate_token, async (req, res, next) => {
 router.post(
   '/investors',
   authenticate_token,
-  upload_image.single('img_file', async (req, res, next) => {
+  upload.single('img_file', async (req, res, next) => {
     try {
       const {
         investor_name,
@@ -65,19 +66,23 @@ router.post(
       const user_id = req.user_id;
       const investor_id = `investor-${nanoid(16)}`;
 
-      const img_file = req.file;
-      if (!img_file) {
+      if (!req.file) {
         throw new InvariantError('Image file is required');
       }
-      const blob = storage.bucket(bucket_name).file(`images/${umkm_id}.jpg`);
-      const blobStream = blob.createWriteStream();
+      const bucket = storage.bucket(bucket_name);
+      const blob = bucket.file(`images/${investor_id}-image.jpg`);
+      const blobStream = blob.createWriteStream({
+        resumable: false,
+        contentType: req.file.mimetype,
+      });
+
       blobStream.on('error', (err) => {
         next(err);
       });
 
       blobStream.on('finish', async () => {
         const img_url = `https://storage.googleapis.com/${bucket_name}/${blob.name}`;
-        const new_umkm = await Investors.build({
+        const new_investor = await Investors.build({
           investor_id,
           user_id,
           investor_name,
@@ -94,7 +99,7 @@ router.post(
           phone_number,
         });
 
-        await new_umkm.save();
+        await new_investor.save();
       });
       res
         .status(200)
