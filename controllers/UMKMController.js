@@ -123,12 +123,13 @@ router.post(
           growth_rate,
           phone_number,
         });
+
         await new_umkm.save();
       });
+      blobStream.end(req.file.buffer);
       res
         .status(200)
-        .json({ message: 'Successfully created new UMKM', data: umkm_id });
-      blobStream.end(req.file.buffer);
+        .json({ message: 'Successfully created new UMKM', data: { umkm_id } });
     } catch (error) {
       next(error);
     }

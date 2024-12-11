@@ -3,8 +3,8 @@ const InvariantError = require('../exceptions/InvariantError');
 
 const investment_request_payload_schema = Joi.object({
   investor_id: Joi.string().required().messages({
-    'number.base': 'UMKM ID must be a number',
-    'any.required': 'UMKM ID is required',
+    'number.base': 'Investor ID must be a number',
+    'any.required': 'Investor ID is required',
   }),
   amount: Joi.number().integer().positive().required().messages({
     'number.base': 'Investment amount must be a number',

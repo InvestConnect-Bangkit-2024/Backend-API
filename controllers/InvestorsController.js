@@ -35,7 +35,8 @@ router.get('/investors', authenticate_token, async (req, res, next) => {
 router.post(
   '/investors',
   authenticate_token,
-  upload.single('img_file', async (req, res, next) => {
+  upload.single('img_file'),
+  async (req, res, next) => {
     try {
       const {
         investor_name,
@@ -50,6 +51,7 @@ router.post(
         criteria,
         phone_number,
       } = req.body;
+
       await investor_validator.validate_investor_payload({
         investor_name,
         location,
@@ -69,6 +71,7 @@ router.post(
       if (!req.file) {
         throw new InvariantError('Image file is required');
       }
+
       const bucket = storage.bucket(bucket_name);
       const blob = bucket.file(`images/${investor_id}-image.jpg`);
       const blobStream = blob.createWriteStream({
@@ -81,6 +84,7 @@ router.post(
       });
 
       blobStream.on('finish', async () => {
+        console.log('here');
         const img_url = `https://storage.googleapis.com/${bucket_name}/${blob.name}`;
         const new_investor = await Investors.build({
           investor_id,
@@ -101,13 +105,15 @@ router.post(
 
         await new_investor.save();
       });
-      res
-        .status(200)
-        .json({ message: 'Successfully created new UMKM', data: umkm_id });
+      blobStream.end(req.file.buffer);
+      res.status(200).json({
+        message: 'Successfully created new investor',
+        data: { investor_id },
+      });
     } catch (err) {
       next(err);
     }
-  })
+  }
 );
 
 router.get('/investors/:id', async (req, res, next) => {

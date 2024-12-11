@@ -40,7 +40,7 @@ UMKM.associate = (models) => {
 
 Investors.associate = (models) => {
   Investors.hasMany(models.InvestmentRequests, {
-    foreignKey: 'investors_id',
+    foreignKey: 'investor_id',
     as: 'requests',
   });
   Investors.belongsTo(models.Users, { foreignKey: 'user_id', as: 'user' });
@@ -59,7 +59,7 @@ InvestmentOfferings.associate = (models) => {
 
 InvestmentRequests.associate = (models) => {
   InvestmentRequests.belongsTo(models.Investors, {
-    foreignKey: 'investors_id',
+    foreignKey: 'investor_id',
     as: 'investor',
   });
   InvestmentRequests.belongsTo(models.Users, {

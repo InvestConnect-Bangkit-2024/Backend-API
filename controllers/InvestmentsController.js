@@ -108,7 +108,7 @@ router.get(
   async (req, res, next) => {
     try {
       const investment_requests = await InvestmentRequests.findAll({
-        where: { user_id: req.user.id },
+        where: { user_id: req.user_id },
       });
       res.status(200).json({
         message: `Successfully get list of investment requests for ${req.user_id}`,
@@ -162,15 +162,21 @@ router.post(
         investor_id,
         amount,
       });
+      const investorExist = await Investors.findOne({ where: { investor_id } });
+      if (!investorExist) {
+        throw new NotFoundError(`Investor ${investor_id} does not exist`);
+      }
+
       const investment_request_id = `investment-${nanoid(16)}`;
+
       await InvestmentRequests.create({
-        investment_offering_id,
+        investment_request_id,
         user_id: req.user_id,
         investor_id,
         amount,
         created_at: new Date(),
         status: 'Pending',
-        confirmed_date: NULL,
+        confirmed_date: null,
       });
 
       return res.status(200).json({
