@@ -42,6 +42,10 @@ const investor_payload_schema = Joi.object({
     'string.base': 'Criteria must be a string',
     'any.required': 'Criteria is required',
   }),
+  phone_number: Joi.string().max(255).optional().messages({
+    'string.base': 'Phone number must be a string',
+    'string.max': 'Phone number must be less than or equal to 255 characters',
+  }),
 });
 
 const investor_validator = {

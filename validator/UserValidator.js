@@ -20,10 +20,6 @@ const user_payload_schema = Joi.object({
     'string.base': 'Fullname must be a string',
     'any.required': 'Fullname is required',
   }),
-  phone_number: Joi.string().required().messages({
-    'string.base': 'Phone number must be a string',
-    'any.required': 'Phone number is required',
-  }),
 });
 
 const user_validator = {

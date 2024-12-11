@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Users = sequelize.define(
-  'user',
+  'Users',
   {
     user_id: {
       type: DataTypes.STRING,
@@ -25,20 +25,6 @@ const Users = sequelize.define(
     fullname: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    phone_number: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    type: {
-      type: DataTypes.ENUM('UMKM', 'Investor'),
-      allowNull: false,
-      validate: {
-        isIn: {
-          args: [['UMKM', 'Investor']],
-          msg: 'Type must be UMKM or Investor',
-        },
-      },
     },
   },
   {

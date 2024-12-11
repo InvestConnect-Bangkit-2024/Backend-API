@@ -1,24 +1,32 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
-const investments = sequelize.define(
-  'investments',
+const InvestmentOfferings = sequelize.define(
+  'InvestmentOfferings',
   {
-    investment_id: {
+    investment_offering_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
     },
+    user_id: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      references: {
+        model: 'users',
+        key: 'user_id',
+      },
+    },
     umkm_id: {
       type: DataTypes.STRING(50),
       allowNull: false,
+      references: {
+        model: 'umkm',
+        key: 'umkm_id',
+      },
     },
-    investor_id: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-    },
-    investment_amount: {
+    amount: {
       type: DataTypes.BIGINT,
       allowNull: false,
     },
@@ -27,29 +35,17 @@ const investments = sequelize.define(
       defaultValue: DataTypes.NOW,
     },
     status: {
-      type: DataTypes.ENUM('Pending', 'Confirmed'),
+      type: DataTypes.ENUM('Pending', 'Accepted', 'Rejected'),
       allowNull: false,
     },
     confirmed_date: {
       type: DataTypes.DATE,
     },
-    request_type: {
-      type: DataTypes.ENUM('UMKM Request', 'Investor Offer'),
-      allowNull: false,
-    },
-    investor_status: {
-      type: DataTypes.ENUM('Review', 'Rejected', 'Approved'),
-      defaultValue: 'Review',
-    },
-    umkm_status: {
-      type: DataTypes.ENUM('Review', 'Rejected', 'Approved'),
-      defaultValue: 'Review',
-    },
   },
   {
-    tableName: 'investments',
+    tableName: 'investment_offerings',
     timestamps: false,
   }
 );
 
-module.exports = investments;
+module.exports = InvestmentOfferings;

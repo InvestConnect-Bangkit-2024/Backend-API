@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const { generate_access_token } = require('../token/TokenManager');
 
 async function authenticate_token(req, res, next) {
   try {
@@ -22,15 +21,7 @@ async function authenticate_token(req, res, next) {
         .json({ message: 'Invalid or expired access token' });
     }
 
-    // Step 2: Check if the userId from the token matches the requested account id
-    const requestedUserId = req.params.id;
-    if (decodedAccessToken.user_id !== requestedUserId) {
-      return res.status(403).json({
-        message: 'Access forbidden: token does not match requested user',
-      });
-    }
-
-    req.userId = decodedAccessToken.user_id;
+    req.user_id = decodedAccessToken.user_id;
     return next();
   } catch (error) {
     res.status(403).json({ message: error.message || 'Unauthorized' });

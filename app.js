@@ -6,6 +6,7 @@ const investor_routes = require('./controllers/InvestorsController');
 const auth_routes = require('./controllers/AuthenticationsController');
 const users_routes = require('./controllers/UsersController');
 const umkm_routes = require('./controllers/UMKMController');
+const investments_routes = require('./controllers/InvestmentsController');
 require('dotenv').config();
 
 const errorHandler = require('./middleware/ErrorHandler');
@@ -20,6 +21,7 @@ app.use(auth_routes);
 app.use(users_routes);
 app.use(investor_routes);
 app.use(umkm_routes);
+app.use(investments_routes);
 
 app.use(errorHandler);
 module.exports = app;

@@ -2,13 +2,17 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Investors = sequelize.define(
-  'investors',
+  'Investors',
   {
     investor_id: {
       type: DataTypes.STRING(50),
       allowNull: false,
       unique: true,
       primaryKey: true,
+    },
+    user_id: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
       references: {
         model: 'users',
         key: 'user_id',
@@ -56,6 +60,10 @@ const Investors = sequelize.define(
     criteria: {
       type: DataTypes.TEXT,
       allowNull: false,
+    },
+    phone_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   { tableName: 'investors', timestamps: false }
