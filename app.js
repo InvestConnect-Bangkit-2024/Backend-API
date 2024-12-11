@@ -15,6 +15,7 @@ const app = express();
 connectDB();
 
 app.use(body_parser.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(auth_routes);
 app.use(users_routes);
 app.use(investor_routes);

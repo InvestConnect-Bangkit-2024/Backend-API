@@ -25,6 +25,7 @@ router.post(
   upload_image.single('img_file'),
   async (req, res, next) => {
     try {
+      console.log(req);
       const {
         username,
         email,
