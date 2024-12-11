@@ -136,7 +136,7 @@ router.post(
   }
 );
 
-router.get('/umkm/:id', async (req, res, next) => {
+router.get('/umkm/:id', authenticate_token, async (req, res, next) => {
   try {
     const umkm_id = req.params.id;
     const umkm_detail = await UMKM.findOne({

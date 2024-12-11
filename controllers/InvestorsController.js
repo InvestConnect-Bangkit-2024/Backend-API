@@ -116,7 +116,7 @@ router.post(
   }
 );
 
-router.get('/investors/:id', async (req, res, next) => {
+router.get('/investors/:id', authenticate_token, async (req, res, next) => {
   try {
     const investor_id = req.params.id;
     const investor_detail = await Investors.findOne({

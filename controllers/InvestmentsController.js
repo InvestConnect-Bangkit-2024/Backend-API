@@ -10,8 +10,10 @@ const {
 } = require('../models/index');
 const investment_offering_validator = require('../validator/InvestmentOfferingValidator');
 const investment_request_validator = require('../validator/InvestmentRequestValidator');
-const NotFoundError = require('../exceptions/NotFoundError');
 const { Sequelize } = require('sequelize');
+const NotFoundError = require('../exceptions/NotFoundError');
+const InvariantError = require('../exceptions/InvariantError');
+const AuthorizationError = require('../exceptions/AuthorizationError');
 
 router.get(
   '/investments/offerings/sent',
@@ -96,6 +98,56 @@ router.post(
         message: 'Successfully create investment offering',
         data: { investment_offering_id },
       });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.put(
+  '/investments/offerings/:id',
+  authenticate_token,
+  async (req, res, next) => {
+    try {
+      const investment_offering_id = req.params.id;
+
+      const { status } = req.body;
+
+      const investment_offering_exist = await InvestmentOfferings.findOne({
+        where: { investment_offering_id },
+        attributes: ['umkm_id'],
+      });
+
+      if (!investment_offering_exist)
+        throw new NotFoundError(
+          `Investment offering ${investment_offering_id} not found`
+        );
+
+      const umkm_owned_by_user = await UMKM.findOne({
+        where: {
+          umkm_id: investment_offering_exist.umkm_id,
+          user_id: req.user_id,
+        },
+      });
+
+      if (!umkm_owned_by_user) {
+        throw new AuthorizationError(
+          `User ${req.user_id} is not allowed to change investment offerings status sent to umkm ${investment_offering_exist.umkm_id}`
+        );
+      }
+      if (status !== 'Accepted' && status !== 'Rejected') {
+        throw new InvariantError(
+          'The status must be either Accepted or Rejected'
+        );
+      }
+
+      await InvestmentOfferings.update(
+        { status },
+        { where: { investment_offering_id } }
+      );
+      return res
+        .status(200)
+        .json({ message: 'Successfully updated investment offering status' });
     } catch (err) {
       next(err);
     }
@@ -189,4 +241,57 @@ router.post(
     }
   }
 );
+
+router.put(
+  '/investments/requests/:id',
+  authenticate_token,
+  async (req, res, next) => {
+    try {
+      const investment_request_id = req.params.id;
+      const { status } = req.body;
+
+      const investment_request_exist = await InvestmentRequests.findOne({
+        where: { investment_request_id },
+        attributes: ['investor_id'],
+      });
+
+      if (!investment_request_exist) {
+        throw new NotFoundError(
+          `Investment request ${investment_request_id} not found`
+        );
+      }
+
+      const investor_owned_by_user = await Investors.findOne({
+        where: {
+          investor_id: investment_request_exist.investor_id,
+          user_id: req.user_id,
+        },
+      });
+
+      if (!investor_owned_by_user) {
+        throw new AuthorizationError(
+          `User ${req.user_id} is not allowed to change investment request status sent to investor ${investment_request_exist.investor_id}`
+        );
+      }
+
+      if (status !== 'Accepted' && status !== 'Rejected') {
+        throw new InvariantError(
+          'The status must be either Accepted or Rejected'
+        );
+      }
+
+      await InvestmentRequests.update(
+        { status },
+        { where: { investment_request_id } }
+      );
+
+      return res
+        .status(200)
+        .json({ message: 'Successfully updated investment request status' });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 module.exports = router;
