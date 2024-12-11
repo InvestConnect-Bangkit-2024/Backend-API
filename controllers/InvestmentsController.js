@@ -158,6 +158,7 @@ router.post(
   async (req, res, next) => {
     try {
       const { investor_id, amount } = req.body;
+      console.log(investor_id, amount);
       await investment_request_validator.validate_investment_request_payload({
         investor_id,
         amount,
