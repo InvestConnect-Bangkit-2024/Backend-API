@@ -5,7 +5,7 @@ const { sequelize } = require('../config/database');
 const Users = require('./UsersModel');
 const UMKM = require('./UMKMModel');
 const InvestmentOfferings = require('./InvestmentOfferingsModel');
-const InvestmentRequests = require('./investmentRequestsModel');
+const InvestmentRequests = require('./InvestmentRequestsModel');
 const Investors = require('./InvestorsModel');
 
 const models = {
