@@ -285,7 +285,7 @@ router.put(
         const new_amount =
           investment_request_exist.amount +
           investor_owned_by_user.total_investments;
-        const new_total_deals = investor_owned_by_user.total_investments + 1;
+        const new_total_deals = investor_owned_by_user.total_deals + 1;
 
         await Investors.update(
           {
