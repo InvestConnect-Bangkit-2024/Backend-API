@@ -17,19 +17,10 @@ router.get('/account/:id', authenticate_token, async (req, res, next) => {
     }
 
     let additional_data = {};
-    if (user_data.type == 'UMKM') {
-      additional_data = await umkm.findOne({ where: { umkm_id: user_id } });
-    } else if (user_data.type === 'Investor') {
-      additional_data = await investor.findOne({
-        where: { investor_id: user_id },
-      });
-    }
+
     res.status(200).json({
       message: 'user profile fetched successfully',
-      data: {
-        ...user_data.toJSON(),
-        ...additional_data.toJSON(),
-      },
+      data: user_data,
     });
   } catch (error) {
     next(error);
