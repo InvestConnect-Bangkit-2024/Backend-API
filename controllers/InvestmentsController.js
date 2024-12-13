@@ -142,9 +142,10 @@ router.put(
       }
 
       await InvestmentOfferings.update(
-        { status },
+        { status, confirmed_date: new Date() },
         { where: { investment_offering_id } }
       );
+
       return res
         .status(200)
         .json({ message: 'Successfully updated investment offering status' });
@@ -280,8 +281,25 @@ router.put(
         );
       }
 
+      if (status === 'Accepted') {
+        const new_amount =
+          investment_request_exist.amount +
+          investor_owned_by_user.total_investments;
+        const new_total_deals = investor_owned_by_user.total_investments + 1;
+
+        await Investors.update(
+          {
+            investment_amount: new_amount,
+            total_deals: new_total_deals,
+          },
+          {
+            where: { investor_id: investment_request_exist.investor_id },
+          }
+        );
+      }
+
       await InvestmentRequests.update(
-        { status },
+        { status, confirmed_date: new Date() },
         { where: { investment_request_id } }
       );
 
