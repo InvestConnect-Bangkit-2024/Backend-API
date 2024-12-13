@@ -10,13 +10,12 @@ router.get('/account/:id', authenticate_token, async (req, res, next) => {
     const user_id = req.params.id;
     const user_data = await user.findOne({
       where: { user_id },
+      attributes: ['user_id', 'username', 'email', 'fullname'],
     });
 
     if (!user_data) {
       throw new NotFoundError(`User ${user_id} not found`);
     }
-
-    let additional_data = {};
 
     res.status(200).json({
       message: 'user profile fetched successfully',
@@ -51,9 +50,11 @@ router.put('/account/:id', authenticate_token, async (req, res, next) => {
 
     await current_data.save();
 
+    const { password, ...responseData } = current_data.toJSON();
+
     return res.status(200).json({
       message: 'User data updated successfully',
-      updated_data: current_data,
+      updated_data: responseData,
     });
   } catch (error) {
     next(error);
