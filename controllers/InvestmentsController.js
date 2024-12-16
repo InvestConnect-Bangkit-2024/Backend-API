@@ -24,10 +24,32 @@ router.get(
         where: {
           user_id: req.user_id,
         },
+        include: [
+          {
+            model: UMKM,
+            as: 'umkm',
+            attributes: ['img_url', 'company_name'],
+          },
+        ],
       });
+
+      const mappedData = investment_offerings.map((item) => ({
+        investment_offering_id: item.investment_offering_id,
+        user_id: item.user_id,
+        umkm_id: item.umkm_id,
+        amount: item.amount,
+        created_at: item.created_at,
+        status: item.status,
+        confirmed_date: item.confirmed_date,
+        img_url: item.umkm.img_url,
+        company_name: item.umkm.company_name,
+      }));
+
+      console.log(mappedData);
+
       res.status(200).json({
         message: `Successfully get list of investment offerings for ${req.user_id}`,
-        data: investment_offerings,
+        data: mappedData,
       });
     } catch (err) {
       next(err);
@@ -53,11 +75,30 @@ router.get(
             [Sequelize.Op.in]: umkm_ids,
           },
         },
+        include: [
+          {
+            model: UMKM,
+            as: 'umkm',
+            attributes: ['img_url', 'company_name'],
+          },
+        ],
       });
+
+      const mappedData = investment_offerings.map((item) => ({
+        investment_offering_id: item.investment_offering_id,
+        user_id: item.user_id,
+        umkm_id: item.umkm_id,
+        amount: item.amount,
+        created_at: item.created_at,
+        status: item.status,
+        confirmed_date: item.confirmed_date,
+        img_url: item.umkm.img_url,
+        company_name: item.umkm.company_name,
+      }));
 
       res.status(200).json({
         message: 'Successfully fetched list of received investment offerings',
-        data: investment_offerings,
+        data: mappedData,
       });
     } catch (err) {
       next(err);
@@ -162,10 +203,30 @@ router.get(
     try {
       const investment_requests = await InvestmentRequests.findAll({
         where: { user_id: req.user_id },
+        include: [
+          {
+            model: Investors,
+            as: 'investor',
+            attributes: ['img_url', 'investor_name'],
+          },
+        ],
       });
+
+      const mappedData = investment_requests.map((item) => ({
+        investment_request_id: item.investment_request_id,
+        user_id: item.user_id,
+        investor_id: item.umkm_id,
+        amount: item.amount,
+        created_at: item.created_at,
+        status: item.status,
+        confirmed_date: item.confirmed_date,
+        img_url: item.investor.img_url,
+        investor_name: item.investor.investor_name,
+      }));
+
       res.status(200).json({
         message: `Successfully get list of investment requests for ${req.user_id}`,
-        data: investment_requests,
+        data: mappedData,
       });
     } catch (err) {
       next(err);
@@ -193,11 +254,29 @@ router.get(
             [Sequelize.Op.in]: investor_ids,
           },
         },
+        include: [
+          {
+            model: Investors,
+            as: 'investor',
+            attributes: ['img_url', 'investor_name'],
+          },
+        ],
       });
+      const mappedData = investment_requests.map((item) => ({
+        investment_request_id: item.investment_request_id,
+        user_id: item.user_id,
+        investor_id: item.umkm_id,
+        amount: item.amount,
+        created_at: item.created_at,
+        status: item.status,
+        confirmed_date: item.confirmed_date,
+        img_url: item.investor.img_url,
+        investor_name: item.investor.investor_name,
+      }));
 
       res.status(200).json({
         message: `Successfully get list of investment requests for ${req.user_id}`,
-        data: investment_requests,
+        data: mappedData,
       });
     } catch (err) {
       next(err);
